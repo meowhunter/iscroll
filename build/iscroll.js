@@ -1,4 +1,4 @@
-/*! iScroll v5.1.3 ~ (c) 2008-2014 Matteo Spinelli ~ http://cubiq.org/license */
+/*! iScroll v5.1.3 ~ (c) 2008-2015 Matteo Spinelli ~ http://cubiq.org/license */
 (function (window, document, Math) {
 var rAF = window.requestAnimationFrame	||
 	window.webkitRequestAnimationFrame	||
@@ -387,7 +387,7 @@ IScroll.prototype = {
 			return;
 		}
 
-		if ( this.options.preventDefault && !utils.isBadAndroid && !utils.preventDefaultException(e.target, this.options.preventDefaultException) ) {
+		if ( this.options.preventDefault && !utils.isBadAndroid && !utils.preventDefaultException(e.target, this.options.preventDefaultException) && this.maxScroll > 0 ) {
 			e.preventDefault();
 		}
 
@@ -429,10 +429,6 @@ IScroll.prototype = {
 	_move: function (e) {
 		if ( !this.enabled || utils.eventType[e.type] !== this.initiated ) {
 			return;
-		}
-
-		if ( this.options.preventDefault ) {	// increases performance on Android? TODO: check!
-			e.preventDefault();
 		}
 
 		var point		= e.touches ? e.touches[0] : e,
@@ -498,6 +494,10 @@ IScroll.prototype = {
 		}
 		if ( newY > 0 || newY < this.maxScrollY ) {
 			newY = this.options.bounce ? this.y + deltaY / 3 : newY > 0 ? 0 : this.maxScrollY;
+		}
+
+		if ( this.options.preventDefault && newY > 0 && newY < this.maxScrollY ) {	// increases performance on Android? TODO: check!
+			e.preventDefault();
 		}
 
 		this.directionX = deltaX > 0 ? -1 : deltaX < 0 ? 1 : 0;
@@ -1035,7 +1035,6 @@ IScroll.prototype = {
 			return;
 		}
 
-		e.preventDefault();
 		e.stopPropagation();
 
 		var wheelDeltaX, wheelDeltaY,
@@ -1114,6 +1113,10 @@ IScroll.prototype = {
 			newY = 0;
 		} else if ( newY < this.maxScrollY ) {
 			newY = this.maxScrollY;
+		}
+
+		if( newY > 0 && newY < this.maxScrollY){
+			e.preventDefault();
 		}
 
 		this.scrollTo(newX, newY, 0);
